@@ -56,6 +56,7 @@ components:
           description: For files that are in a section, this field describes the section.
           properties:
             id:
+              description: The unique id of the section
               type: string
         content:
           type: string
@@ -112,6 +113,7 @@ components:
           minimum: 1
           maximum: 64
         characterSets:
+          description: The character sets used to generate the value
           type: array
           items:
             type: string
@@ -297,6 +299,7 @@ components:
           format: date-time
           readOnly: true
         action:
+          description: The action that was performed on the resource
           type: string
           enum:
             - READ
@@ -304,45 +307,59 @@ components:
             - UPDATE
             - DELETE
         result:
+          description: Whether the request was allowed or denied
           type: string
           enum:
             - SUCCESS
             - DENY
         actor:
+          description: The token and client that made the request
           type: object
           properties:
             id:
+              description: The unique id of the token that made the request
               type: string
               format: uuid
             account:
+              description: The id of the 1Password account the token belongs to
               type: string
             jti:
+              description: The unique id of the token, as in the JWT `jti` claim
               type: string
             userAgent:
+              description: The user agent of the client that made the request
               type: string
             requestIp:
+              description: The IP address the request came from
               type: string
         resource:
+          description: The vault or item the request accessed
           type: object
           properties:
             type:
+              description: Whether the request accessed an item or a vault
               type: string
               enum:
                 - ITEM
                 - VAULT
             vault:
+              description: The vault the request accessed
               type: object
               properties:
                 id:
+                  description: The unique id of the vault
                   type: string
                   pattern: '^[\da-z]{26}$'
             item:
+              description: The item the request accessed
               type: object
               properties:
                 id:
+                  description: The unique id of the item
                   type: string
                   pattern: '^[\da-z]{26}$'
             itemVersion:
+              description: The version of the item the request accessed
               type: integer
     Patch:
       type: array
@@ -357,7 +374,7 @@ components:
             description: An RFC6901 JSON Pointer pointing to the Item document, an Item Attribute, and Item Field by Field ID, or an Item Field Attribute
             example: "/fields/06gnn2b95example10q91512p5/label"
           value:
-            type: object
+            description: The new value for the attribute or field. It can be any JSON value
         required:
           - op
           - path
@@ -366,8 +383,10 @@ components:
       type: object
       properties:
         service:
+          description: The name of the dependent service
           type: string
         status:
+          description: The state of the dependent service, for example ACTIVE
           type: string
         message:
           type: string
@@ -570,6 +589,7 @@ paths:
           required: true
           description: The UUID of the Vault to create an Item in
       requestBody:
+        description: The Item to create, including its fields, sections and URLs
         content:
           application/json:
             schema:
@@ -708,6 +728,7 @@ paths:
           required: true
           description: The UUID of the Item to update
       requestBody:
+        description: The complete Item to store in place of the existing one
         content:
           application/json:
             schema:
@@ -847,6 +868,7 @@ paths:
           required: true
           description: The UUID of the Item to update
       requestBody:
+        description: The list of patch operations to apply to the Item
         content:
           application/json:
             schema:
@@ -1133,7 +1155,7 @@ paths:
         - ConnectToken: [ ]
       responses:
         "200":
-          description: "Success"
+          description: "The raw content of the file"
           content:
             application/octet-stream:
               schema:
