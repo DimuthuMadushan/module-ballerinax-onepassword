@@ -32,7 +32,7 @@ public function main() returns error? {
     onepassword:Client connect = check new ({auth: {token: connectToken}}, connectServerUrl);
 
     // Step 1: locate the vault by name.
-    onepassword:Vault[] vaults = check connect->listVaults(filter = string `name eq "${vaultName}"`);
+    onepassword:Vault[] vaults = check connect->listVaults(filter = string `name eq "${scimString(vaultName)}"`);
     if vaults.length() == 0 {
         return error(string `No vault named ${vaultName} is visible to this token`);
     }
@@ -65,11 +65,21 @@ public function main() returns error? {
     io:println("Item title is now: ", renamed?.title);
 
     // Step 4: list the items in the vault to confirm it is there.
-    onepassword:Item[] items = check connect->listItems(vaultId, filter = string `title eq "${newItemTitle}"`);
+    onepassword:Item[] items = check connect->listItems(vaultId, filter = string `title eq "${scimString(newItemTitle)}"`);
     io:println("Items matching the new title: ", items.length());
 
     if deleteItemAfterwards {
         check connect->deleteItem(vaultId, itemId);
         io:println("Deleted item ", itemId);
     }
+}
+
+// Escapes a value for use inside a double-quoted SCIM filter string, so embedded quotes or
+// backslashes cannot change the filter's syntax.
+function scimString(string value) returns string {
+    string escaped = "";
+    foreach string:Char c in value {
+        escaped += c == "\\" || c == "\"" ? "\\" + c : c;
+    }
+    return escaped;
 }
